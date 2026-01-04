@@ -4,21 +4,31 @@
 
 A full-stack web application designed to help users build and maintain positive habits through gamification techniques such as XP, levels, and achievements.
 
+This project is being developed as part of a Final Year Project and follows an iterative, Agile-based development approach.
+
 ---
 
 ## :jigsaw: Features
-- Feature 1
-- Feature 2
-- Feature 3
+_Current (POC 1):_
+- Full-stack "Hello World" proof of concept
+- React frontend fetching data from backend API
+- Express.js backend serving REST API endpoints
+- PostgreSQL database connection and test query
+
+_Planned:_
+- Habit and goal creation
+- Gamified progression system (XP, levels, achievements)
+- User authentication and personalisation
+- Progress tracking dashboards and statistics
 
 ---
 
 ## :hammer_and_wrench: Tech Stack
-- **Frontend:** React.js
+- **Frontend:** React.js (Vite)
 - **Backend:** Node.js + Express.js
-- **Database:** 
+- **Database:** PostgreSQL
 - **Authentication:** JWT
-- **Hosting:** 
+- **Hosting:** Vercel (Frontend), Render (Backend)
 
 
 ---
@@ -26,8 +36,9 @@ A full-stack web application designed to help users build and maintain positive 
 ## :rocket: Getting Started
 
 ### Prerequisites
-- Node.js
+- Node.js (v18+ recommended)
 - npm or yarn
+- PostgreSQL (local or cloud-based)
 
 ### Setup
 1. Clone the repo
@@ -36,6 +47,28 @@ git clone https://github.com/<your-username>/gamified-personal-development-app.g
 ````
 
 2. Install npm packages
-```bash
-npm install
-````
+    2.1 Frontend
+    ```bash
+    cd client
+    npm install
+    ````
+    2.2 Backend
+    ```bash
+    cd server
+    npm install
+    ````
+
+3. Configure Environment Variables
+Create .env files in both /server and /client as required
+
+4. Run the Application Locally
+    2.1 Frontend
+    ```bash
+    cd client
+    npm run dev
+    ````
+    2.2 Backend
+    ```bash
+    cd server
+    npm run dev
+    ````
