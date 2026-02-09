@@ -1,76 +1,131 @@
 import {
   Sidebar,
   SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
+  SidebarHeader,
+  SidebarFooter,
   SidebarMenu,
   SidebarMenuItem,
-  SidebarMenuButton
+  SidebarMenuButton,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarSeparator,
+  useSidebar
 } from "@/components/ui/sidebar";
-import { Home, Target, Trophy, User, LogOut } from "lucide-react";
+import { Home, Target, Trophy, User, Settings, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
 
+const options = {
+  Main: [
+    {
+      title: "Dashboard",
+      url: "/dashboard",
+      icon: Home
+    },
+    {
+      title: "Goals",
+      url: "/goals",
+      icon: Target
+    },
+    {
+      title: "Achievements",
+      url: "/achievements",
+      icon: Trophy
+    },
+    {
+      title: "Profile",
+      url: "/profile",
+      icon: User
+    },
+  ],
+
+  Footer: [
+    {
+      title: "Settings",
+      url: "/settings",
+      icon: Settings
+    }
+  ],
+  
+  Logout: {
+    title: "Logout",
+    url: "/login",
+    icon: LogOut
+  }
+}
+
 function Navbar() {
+  const { state } = useSidebar();
+
   return (
-    <Sidebar>
+    <Sidebar variant="floating" collapsible="icon">
+      <SidebarHeader className="p-4 flex justify-center">
+        <Link to="/dashboard">
+          {state === "collapsed" ? (
 
-      <SidebarContent>
+          <img
+          src="/logoIcon.png"
+          alt="Stellara Icon"
+          className={`h-12 w-12 object-contain transition-all duration-300`}
+          />
 
-        <div className="p-4 text-xl font-bold">
-          Stellara
-        </div>
+        ) : (
 
+          <img
+          src="/logoFull.png"
+          alt="Stellara Logo"
+          className={`h-20 w-auto object-contain transition-all duration-300`}
+          />
+
+        )}
+        </Link>
+      </SidebarHeader>
+
+        <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
-
             <SidebarMenu>
-
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link to="/dashboard">
-                    <Home /> Dashboard
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link to="/goals">
-                    <Target /> Goals
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link to="/achievements">
-                    <Trophy /> Achievements
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link to="/profile">
-                    <User /> Profile
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link to="/login">
-                    <LogOut /> Logout
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-
+              {options.Main.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild tooltip={item.title}>
+                    <Link to={item.url}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
             </SidebarMenu>
-
           </SidebarGroupContent>
         </SidebarGroup>
-
       </SidebarContent>
+
+      <SidebarFooter>
+        <SidebarMenu>
+          {options.Footer.map((item) => (
+            <SidebarMenuItem key={item.title}>
+              <SidebarMenuButton asChild tooltip={item.title}>
+                <Link to={item.url}>
+                  <item.icon />
+                  <span>{item.title}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+
+        <SidebarSeparator />
+
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild tooltip="Logout">
+              <Link to={options.Logout.url}>
+                <options.Logout.icon />
+                <span>{options.Logout.title}</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }

@@ -8,18 +8,13 @@ import { AchievementPreview } from "../components/dashboard/AchievementPreview";
 function Dashboard() {
   return (
     <MainLayout>
-
       <WelcomeHeader />
-
       <XPWidget />
-
       <div className="grid grid-cols-2 gap-6">
         <GoalPreview />
         <StreakCard />
       </div>
-
       <AchievementPreview />
-
     </MainLayout>
   );
 }
