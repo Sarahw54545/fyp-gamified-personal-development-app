@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import MainLayout from "../components/layout/mainLayout";
 import GoalCard from "../components/goals/goalCard.jsx";
-import CreateGoalForm from "../components/goals/CreateGoalForm";
+import CreateGoalForm from "../components/goals/createGoalForm";
 import { toast } from 'sonner';
 
 function Goals() {
