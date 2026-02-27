@@ -46,4 +46,30 @@ router.post("/", async (req, res) => {
   }
 });
 
+// DELETE a goal
+router.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(
+      `
+      DELETE FROM goal
+      WHERE id = $1
+      RETURNING *
+      `,
+      [id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Goal not found" });
+    }
+
+    res.json({ message: "Goal deleted", goal: result.rows[0] });
+
+  } catch (err) {
+    console.error("Error deleting goal:", err.message);
+    res.status(500).json({ error: "Server error while deleting goal" });
+  }
+});
+
 export default router;
