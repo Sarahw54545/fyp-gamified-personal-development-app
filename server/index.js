@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import helloRouter from "./api/hello/index.js";
+import goalsRouter from "./api/goals/index.js"
 import {pool} from "./db.js"
 
 dotenv.config();
@@ -15,6 +16,7 @@ pool.query("SELECT NOW()")
 .catch(err => console.error("PostgreSQL connection error", err));
 
 app.use("/api", helloRouter);
+app.use("/api/goals", goalsRouter);
 
 const PORT = process.env.PORT || 5000;
 
