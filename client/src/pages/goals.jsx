@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import MainLayout from "../components/layout/mainLayout";
 import GoalCard from "../components/goals/goalCard.jsx";
 import CreateGoalForm from "../components/goals/CreateGoalForm";
+import { toast } from 'sonner';
 
 function Goals() {
   const [goals, setGoals] = useState([]);
@@ -29,7 +30,50 @@ function Goals() {
   // Add goal to state immediately after creation
   const handleGoalCreated = (newGoal) => {
     setGoals((prev) => [newGoal, ...prev]);
+
+    toast.custom(() => (
+    <div className="p-4">
+    <strong>Goal Created 🚀</strong>
+    <p>{newGoal.title} has been added successfully.</p>
+    </div>
+    ));
   };
+
+  const handleDelete = async (id) => {
+  try {
+    const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/goals/${id}`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to delete goal");
+    }
+
+    const deletedGoal = goals.find((goal) => goal.id === id);
+
+    setGoals((prev) => prev.filter((goal) => goal.id !== id));
+
+    toast.custom(() => (
+    <div className="p-4">
+    <strong>Goal Deleted 🗑️</strong>
+    <p>{deletedGoal?.title} has been removed.</p>
+    </div>
+    ));
+
+  } catch (err) {
+    console.error(err);
+    
+    toast.custom(() => (
+    <div className="p-4">
+    <strong>Error</strong>
+    <p>Failed to delete goal.</p>
+    </div>
+    ));
+  }
+};
 
   return (
     <MainLayout>
@@ -45,7 +89,7 @@ function Goals() {
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {goals.map((goal) => (
-            <GoalCard key={goal.id} goal={goal} />
+            <GoalCard key={goal.id} goal={goal} onDelete={handleDelete}/>
           ))}
         </div>
 

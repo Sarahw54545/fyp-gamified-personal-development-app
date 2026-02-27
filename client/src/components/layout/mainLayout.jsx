@@ -1,5 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import Navbar from "./navbar";
+import { Toaster } from "sonner";
 
 function MainLayout({ children }) {
   return (
@@ -16,6 +17,8 @@ function MainLayout({ children }) {
           {children}
         </main>
         
+        <Toaster />
+
       </div>
     </SidebarProvider>
   );
