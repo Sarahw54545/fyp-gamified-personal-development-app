@@ -72,4 +72,38 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// Update a goal
+router.put("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description } = req.body;
+
+    // Validation
+    if (!title || title.trim() === "") {
+      return res.status(400).json({ error: "Title is required" });
+    }
+
+    const updatedGoal = await pool.query(
+      `
+      UPDATE goal
+      SET title = $1,
+          description = $2
+      WHERE id = $3 AND is_active = TRUE
+      RETURNING *
+      `,
+      [title, description || null, id]
+    );
+
+    if (updatedGoal.rows.length === 0) {
+      return res.status(404).json({ error: "Goal not found" });
+    }
+
+    res.json(updatedGoal.rows[0]);
+
+  } catch (err) {
+    console.error("Error updating goal:", err.message);
+    res.status(500).json({ error: "Server error while updating goal" });
+  }
+});
+
 export default router;
