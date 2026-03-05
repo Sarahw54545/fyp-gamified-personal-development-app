@@ -75,6 +75,20 @@ function Goals() {
   }
 };
 
+const handleGoalUpdated = (updatedGoal) => {
+  setGoals((prev) =>
+    prev.map((goal) =>
+      goal.id === updatedGoal.id ? updatedGoal : goal
+    ));
+
+    toast.custom(() => (
+    <div className="p-4">
+    <strong>Goal Updated ✏️</strong>
+    <p>Your Changes Have Been Saved.</p>
+    </div>
+    ));
+}
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -89,7 +103,7 @@ function Goals() {
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {goals.map((goal) => (
-            <GoalCard key={goal.id} goal={goal} onDelete={handleDelete}/>
+            <GoalCard key={goal.id} goal={goal} onDelete={handleDelete} onGoalUpdated={handleGoalUpdated}/>
           ))}
         </div>
 

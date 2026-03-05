@@ -7,8 +7,9 @@ import {
   CardFooter
 } from "@/components/ui/card";
 import DeleteGoalDialog from "./deleteGoalDialog";
+import EditGoalForm from "./EditGoalForm"
 
-function GoalCard({ goal, onDelete }) {
+function GoalCard({ goal, onDelete, onGoalUpdated }) {
   return (
     <Card className="bg-slate-900 border-slate-800 hover:border-indigo-500 hover:shadow-[0_0_20px_rgba(99,102,241,0.4)] transition-all duration-300">
       <CardHeader>
@@ -31,7 +32,12 @@ function GoalCard({ goal, onDelete }) {
         </div>
       </CardContent>
 
-      <CardFooter className="flex justify-end">
+      <CardFooter className="flex justify-end gap-3">
+        <EditGoalForm
+            goal={goal}
+            onGoalUpdated={onGoalUpdated}
+          />
+
         <DeleteGoalDialog
           goalTitle={goal.title}
           onConfirm={() => onDelete(goal.id)}
