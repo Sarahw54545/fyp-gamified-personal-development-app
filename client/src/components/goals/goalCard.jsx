@@ -7,7 +7,7 @@ import {
   CardFooter
 } from "@/components/ui/card";
 import DeleteGoalDialog from "./deleteGoalDialog";
-import EditGoalForm from "./EditGoalForm"
+import EditGoalForm from "./editGoalForm"
 
 function GoalCard({ goal, onDelete, onGoalUpdated }) {
   return (
