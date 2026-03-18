@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import MainLayout from "../components/layout/mainLayout";
+import { apiFetch } from "@/services/apiClient";
 import GoalCard from "../components/goals/goalCard.jsx";
 import CreateGoalForm from "../components/goals/createGoalForm";
 import { toast } from 'sonner';
@@ -10,22 +11,19 @@ function Goals() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/goals`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Failed to fetch goals");
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setGoals(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
-  }, []);
+    async function loadGoals() {
+    try {
+      const data = await apiFetch("/api/goals");
+      setGoals(data);
+    } catch (err) {
+      setError(err.message || "Failed to fetch goals");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  loadGoals();
+}, []);
 
   // Add goal to state immediately after creation
   const handleGoalCreated = (newGoal) => {
@@ -41,16 +39,9 @@ function Goals() {
 
   const handleDelete = async (id) => {
   try {
-    const res = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/goals/${id}`,
-      {
-        method: "DELETE",
-      }
-    );
-
-    if (!res.ok) {
-      throw new Error("Failed to delete goal");
-    }
+    await apiFetch(`/api/goals/${id}`, {
+      method: "DELETE"
+    });
 
     const deletedGoal = goals.find((goal) => goal.id === id);
 
