@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { apiFetch } from "@/services/apiClient";
 import {
   Dialog,
   DialogContent,
@@ -30,22 +31,14 @@ function CreateGoalForm({ onGoalCreated }) {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/goals`,
+      const newGoal = await apiFetch(
+        `/api/goals`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ title, description }),
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to create goal");
-      }
-
-      const newGoal = await response.json();
-
-      // Update parent state
       onGoalCreated(newGoal);
 
       // Reset form
@@ -53,7 +46,7 @@ function CreateGoalForm({ onGoalCreated }) {
       setDescription("");
       setOpen(false);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to create goal");
     } finally {
       setLoading(false);
     }

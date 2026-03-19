@@ -6,8 +6,11 @@ const router = express.Router();
 // GET all goals
 router.get("/", async (req, res) => {
   try {
+    const userId = req.user.id
+
     const result = await pool.query(
-      "SELECT * FROM goal ORDER BY created_at DESC"
+      "SELECT * FROM goal WHERE user_id = $1 ORDER BY created_at DESC",
+      [userId]
     );
 
     res.json(result.rows);
@@ -21,6 +24,7 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const { title, description } = req.body;
+    const userId = req.user.id
 
     if (!title || title.trim() === "") {
       return res.status(400).json({ error: "Title is required" });
@@ -28,13 +32,14 @@ router.post("/", async (req, res) => {
 
     const newGoal = await pool.query(
       `
-      INSERT INTO goal (title, description)
-      VALUES ($1, $2)
+      INSERT INTO goal (title, description, user_id)
+      VALUES ($1, $2, $3)
       RETURNING *
       `,
       [
         title,
-        description || null
+        description,
+        userId || null
       ]
     );
 

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { apiFetch } from "@/services/apiClient"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -39,25 +40,16 @@ function EditGoalForm({ goal, onGoalUpdated }) {
         setLoading(true)
 
         try {
-            const res = await fetch(
-                `${import.meta.env.VITE_API_URL}/api/goals/${goal.id}`,
+            const updatedGoal = await apiFetch(
+                `/api/goals/${goal.id}`,
                 {
                     method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
                     body: JSON.stringify({
                         title,
                         description
                     })
                 }
             )
-
-            if (!res.ok) {
-                throw new Error("Failed to update goal")
-            }
-
-            const updatedGoal = await res.json()
 
             onGoalUpdated(updatedGoal)
 
