@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Home, Target, Trophy, User, Settings, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/use-Auth";
 
 const options = {
   Main: [
@@ -45,16 +46,20 @@ const options = {
       icon: Settings
     }
   ],
-  
+
   Logout: {
     title: "Logout",
-    url: "/login",
     icon: LogOut
   }
 }
 
 function Navbar() {
   const { state } = useSidebar();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <Sidebar variant="floating" collapsible="icon">
@@ -62,25 +67,25 @@ function Navbar() {
         <Link to="/dashboard">
           {state === "collapsed" ? (
 
-          <img
-          src="/logoIcon.png"
-          alt="Stellara Icon"
-          className={`h-12 w-12 object-contain transition-all duration-300`}
-          />
+            <img
+              src="/logoIcon.png"
+              alt="Stellara Icon"
+              className={`h-12 w-12 object-contain transition-all duration-300`}
+            />
 
-        ) : (
+          ) : (
 
-          <img
-          src="/logoFull.png"
-          alt="Stellara Logo"
-          className={`h-20 w-auto object-contain transition-all duration-300`}
-          />
+            <img
+              src="/logoFull.png"
+              alt="Stellara Logo"
+              className={`h-20 w-auto object-contain transition-all duration-300`}
+            />
 
-        )}
+          )}
         </Link>
       </SidebarHeader>
 
-        <SidebarContent>
+      <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -117,11 +122,9 @@ function Navbar() {
 
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Logout">
-              <Link to={options.Logout.url}>
+            <SidebarMenuButton onClick={handleLogout} tooltip={options.Logout.title}>
                 <options.Logout.icon />
                 <span>{options.Logout.title}</span>
-              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

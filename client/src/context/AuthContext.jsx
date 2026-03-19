@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect } from "react";
+import { apiFetch } from "@/services/apiClient"
 
 export const AuthContext = createContext();
 
@@ -18,25 +19,32 @@ export function AuthProvider({ children }) {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    async function loadUser() {
+      const token = localStorage.getItem("token");
 
-    if (!token) {
+      if (!token) {
+        setUser(null);
         setLoading(false);
         return;
-    }
+      }
 
-    try {
-        const payload = JSON.parse(atob(token.split(".")[1]));
+      try {
+        const user = await apiFetch("/api/auth/me");
 
-        setUser({
-            id: payload.userId
-        });
-    } catch (err) {
-        console.error("Invalid Token", err);
+        setUser(user);
+
+      } catch (err) {
+        console.error("Auth validation failed", err);
+
         localStorage.removeItem("token");
+        setUser(null);
+
+      } finally {
+        setLoading(false);
+      }
     }
 
-    setLoading(false)
+    loadUser();
   }, []);
 
   return (
