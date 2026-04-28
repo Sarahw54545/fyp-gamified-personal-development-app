@@ -1,5 +1,5 @@
-import { evaluateGamification } from "./evaluate";
-import { calculateLevel } from "./levels";
+import { evaluateGamification } from "./evaluate.js";
+import { calculateLevel } from "./levels.js";
 
 export default {
   evaluateGamification,

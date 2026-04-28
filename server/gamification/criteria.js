@@ -1,5 +1,5 @@
 // Check Criteria Depending on the Achievement Type
-function matchesCriteria(criteria, userState, event) {
+export function matchesCriteria(criteria, userState, event) {
   
     switch (criteria.type) {
 
@@ -20,7 +20,3 @@ function matchesCriteria(criteria, userState, event) {
       throw new Error(`Unknown criteria type: ${criteria.type}`);
   }
 }
-
-export default {
-  matchesCriteria
-};

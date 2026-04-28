@@ -1,7 +1,7 @@
-import { matchesCriteria } from "./criteria";
-import { ensureAchievementState, isSameDay } from "./utils";
+import { matchesCriteria } from "./criteria.js";
+import { ensureAchievementState, isSameDay } from "./utils.js";
 
-function evaluateGamification({
+export function evaluateGamification({
     userState,
     event,
     achievements,
@@ -96,7 +96,3 @@ function evaluateGamification({
         progressedAchievements
     };
 }
-
-export default {
-    evaluateGamification
-};

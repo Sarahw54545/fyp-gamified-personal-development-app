@@ -10,7 +10,7 @@
  */
 
 // Defaults to 50 (customisable)
-function calculateLevel(totalXp, baseXp = 50) {
+export function calculateLevel(totalXp, baseXp = 50) {
 
     // Initialise at Level 1 with 0 XP
     let level = 1;
@@ -32,7 +32,3 @@ function calculateLevel(totalXp, baseXp = 50) {
 
     return level;
 }
-
-export default {
-    calculateLevel
-};
