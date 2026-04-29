@@ -25,14 +25,18 @@ export function evaluateGamification({
         // -------------------------
         // Daily Achievement - Daily Event Check (Will Only Update Once Per Calendar Day)
         // -------------------------
+
         if (achievement.type === "daily") {
 
-            // Use utility to check if the previous state date value is from the same day
-            const alreadyCompleted = achievementState.lastCompletedDate && isSameDay(achievementState.lastCompletedDate, today);
+            const alreadyCompletedToday = achievementState.lastCompletedDate && isSameDay(achievementState.lastCompletedDate, today);
 
-            // If event hasn't already been completed today and criteria is met - Update last completed date to today, add awarded XP amount + Trigger completed event
-            if (!alreadyCompleted && matchesCriteria(achievement.criteria, userState, event)) {
-                achievementState.lastCompletedDate = today;
+            if (alreadyCompletedToday) {
+                return;
+            }
+
+
+            if (matchesCriteria(achievement.criteria, userState, event)) {
+                achievementState.lastCompletedDate = new Date(today);
                 userState.totalXp += achievement.xp;
                 xpAwarded += achievement.xp;
 
@@ -43,6 +47,7 @@ export function evaluateGamification({
                 });
             }
         }
+
 
         // -------------------------
         // Progressive Achievements

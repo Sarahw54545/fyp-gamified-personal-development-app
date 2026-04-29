@@ -118,7 +118,13 @@ router.post("/:id/complete", async (req, res) => {
 
   const { id } = req.params;
   const userId = req.user.id;
-  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+  const now = new Date();
+  const today = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate()
+  );
 
   const client = await pool.connect();
 
@@ -145,18 +151,7 @@ router.post("/:id/complete", async (req, res) => {
       return res.status(400).json({ error: "Goal not found or already completed" });
     }
 
-    // 2. Increment GOAL_COMPLETED counter - On first completion insert a new row, later completions increment value by 1
-    await client.query(
-      `
-      INSERT INTO user_counters (user_id, counter_key, value)
-      VALUES ($1, 'GOAL_COMPLETED', 1)
-      ON CONFLICT (user_id, counter_key)
-      DO UPDATE SET value = user_counters.value + 1
-      `,
-      [userId]
-    );
-
-    // 3. Load gamification state
+    // 2. Load gamification state
     const [userResult, countersResult, achievementsResult] = await Promise.all([
       client.query(`SELECT total_xp FROM users WHERE id = $1`, [userId]),
       client.query(`SELECT counter_key, value FROM user_counters WHERE user_id = $1`, [userId]),
@@ -187,13 +182,24 @@ router.post("/:id/complete", async (req, res) => {
       )
     };
 
-    // 4. Evaluate gamification
+    // 3. Evaluate gamification
     const gamificationResult = GamificationEngine.evaluateGamification({
       userState,
       event: { type: "GOAL_COMPLETED" },
       achievements,
       today
     });
+
+    // 4. Increment GOAL_COMPLETED counter - On first completion insert a new row, later completions increment value by 1
+    await client.query(
+      `
+      INSERT INTO user_counters (user_id, counter_key, value)
+      VALUES ($1, 'GOAL_COMPLETED', 1)
+      ON CONFLICT (user_id, counter_key)
+      DO UPDATE SET value = user_counters.value + 1
+      `,
+      [userId]
+    );
 
     // 5. Persist XP
     await client.query(
