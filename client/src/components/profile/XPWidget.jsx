@@ -15,7 +15,7 @@ export function XPWidget({ gamification }) {
     100;
 
   return (
-    <Card>
+    <Card className = "bg-slate-900 border-slate-800">
       <CardContent className="p-6 space-y-3">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold text-lg">Level {level}</h3>
