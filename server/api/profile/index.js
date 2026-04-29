@@ -5,7 +5,7 @@ import achievements from "../../gamification/achievements.js";
 
 const router = express.Router();
 
- // GET user profile data
+// GET user profile data
 router.get("/", async (req, res) => {
   const userId = req.user.id;
 
@@ -74,6 +74,12 @@ router.get("/", async (req, res) => {
           description: def.description,
           category: def.category,
           type: def.type,
+
+          tiers: def.tiers.map(t => ({
+            threshold: t.threshold,
+            label: t.label
+          })),
+
           completedTiers,
           currentValue: counters[def.criteria.event] || 0,
           nextThreshold: nextTier ? nextTier.threshold : null,
