@@ -12,48 +12,74 @@ import EditGoalForm from "./editGoalForm"
 
 function GoalCard({ goal, onDelete, onGoalUpdated, onComplete }) {
   const isCompleted = goal.completed;
+  const isArchived = !goal.is_active;
+
 
   return (
 
-    <Card className={`bg-slate-900 border-slate-800 transition-all duration-300 ${!isCompleted && "hover:border-indigo-500 hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]"} ${isCompleted && "opacity-60"}`}>
-      
-      <CardHeader>
-        <CardTitle className={`text-lg ${isCompleted && "line-through"}`}>
-          {goal.title} {isCompleted && "✅"}
+    <Card className={`bg-slate-900 border-slate-800 transition-all duration-300 ${!isCompleted && "hover:border-indigo-500 hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]"}`}>
+
+      <CardHeader className={isCompleted ? "opacity-60" : ""}>
+
+        <CardTitle className="flex items-center gap-2 text-lg">
+          {isCompleted && <span>✅</span>}
+          <span className={isCompleted ? "line-through" : ""}>
+            {goal.title}
+          </span>
         </CardTitle>
+
         <CardDescription>
           {goal.category || "Personal Goal"}
         </CardDescription>
       </CardHeader>
 
-
-      <CardContent>
+      <CardContent className={isCompleted ? "opacity-60" : ""}>
         <p className="text-sm text-muted-foreground mb-4">
           {goal.description}
         </p>
-
-        {/* <div className="flex justify-between text-sm">
-          <span>XP Reward</span>
-          <span className="text-indigo-400 font-semibold">
-            +{goal.xp_reward || 10} XP
-          </span>
-        </div> */}
       </CardContent>
 
-      <CardFooter className="flex justify-end gap-3">
-        <Button variant="success" disabled={isCompleted} onClick={() => onComplete(goal.id)}>
-          {isCompleted ? "Completed" : "Complete"}
-        </Button>
+      <CardFooter className="flex items-center justify-between gap-3">
 
-        <EditGoalForm
-          goal={goal}
-          onGoalUpdated={onGoalUpdated}
-        />
+        {!isCompleted ? (
+          <Button
+            onClick={() => onComplete(goal.id)}
+            className="bg-indigo-600 hover:bg-indigo-700"
+          >
+            Complete
+          </Button>
+        ) : (
+          <Button
+            disabled
+            className="bg-emerald-600 text-white cursor-default"
+          >
+            Completed
+          </Button>
+        )}
 
-        <DeleteGoalDialog
-          goalTitle={goal.title}
-          onConfirm={() => onDelete(goal.id)}
-        />
+
+        <div className="flex gap-2">
+          {!isCompleted && !isArchived && (
+            <EditGoalForm
+              goal={goal}
+              onGoalUpdated={onGoalUpdated}
+            />
+          )}
+
+          {isCompleted && (
+            <Button
+              className="border border-indigo-600text-indigo-300hover:bg-indigo-600 hover:text-white"
+              onClick={() => onArchive(goal.id)}
+            >
+              Archive
+            </Button>
+          )}
+
+          <DeleteGoalDialog
+            goalTitle={goal.title}
+            onConfirm={() => onDelete(goal.id)}
+          />
+        </div>
       </CardFooter>
     </Card>
   );

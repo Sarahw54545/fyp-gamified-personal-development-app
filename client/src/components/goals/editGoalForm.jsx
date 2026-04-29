@@ -66,7 +66,7 @@ function EditGoalForm({ goal, onGoalUpdated }) {
         <Dialog open={open} onOpenChange={setOpen}>
 
             <DialogTrigger asChild>
-                <Button variant="secondary" size="icon">
+                <Button className="bg-slate-700 hover:bg-slate-600 text-white" size="icon">
                     <Pencil size={16} />
                 </Button>
             </DialogTrigger>

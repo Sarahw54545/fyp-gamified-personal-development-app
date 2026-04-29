@@ -80,6 +80,34 @@ function Goals() {
     ));
   }
 
+  const handleArchiveGoal = async (id) => {
+    try {
+      const archivedGoal = await apiFetch(`/api/goals/${id}/archive`, {
+        method: "PUT"
+      });
+
+      setGoals(prev =>
+        prev.filter(goal => goal.id !== archivedGoal.id)
+      );
+
+      toast.custom(() => (
+        <div className="p-4">
+          <strong>Goal Archived 📦</strong>
+          <p>The goal has been archived.</p>
+        </div>
+      ));
+
+    } catch (err) {
+      console.error(err);
+      toast.custom(() => (
+        <div className="p-4">
+          <strong>Error</strong>
+          <p>Failed to archive goal.</p>
+        </div>
+      ));
+    }
+  };
+
   const handleCompleteGoal = async (id) => {
     try {
       const res = await apiFetch(`/api/goals/${id}/complete`, {
@@ -91,7 +119,6 @@ function Goals() {
           goal.id === id ? res.goal : goal
         )
       );
-
 
       res.gamification.unlockedAchievements.forEach((achievement) => {
         toast.custom(() => (
@@ -111,44 +138,44 @@ function Goals() {
         ));
       });
 
-      } catch (err) {
-        console.error(err);
-        toast.custom(() => (
-          <div className="p-4">
-            <strong>Error</strong>
-            <p>Failed to complete goal.</p>
-          </div>
-        ));
-      }
-    };
-
-
-    return (
-      <MainLayout>
-        <div className="space-y-6">
-
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold">Your Goals 🚀</h1>
-            <CreateGoalForm onGoalCreated={handleGoalCreated} />
-          </div>
-
-          {loading && <p>Loading goals...</p>}
-          {error && <p className="text-red-500">{error}</p>}
-
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {goals.map((goal) => (
-              <GoalCard key={goal.id} goal={goal} onDelete={handleDelete} onGoalUpdated={handleGoalUpdated} onComplete={handleCompleteGoal} />
-            ))}
-          </div>
-
-          {!loading && goals.length === 0 && (
-            <p className="text-muted-foreground">
-              No goals yet. Create your first one 🌟
-            </p>
-          )}
+    } catch (err) {
+      console.error(err);
+      toast.custom(() => (
+        <div className="p-4">
+          <strong>Error</strong>
+          <p>Failed to complete goal.</p>
         </div>
-      </MainLayout>
-    );
-  }
+      ));
+    }
+  };
 
-  export default Goals;
+
+  return (
+    <MainLayout>
+      <div className="space-y-6">
+
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold">Your Goals 🚀</h1>
+          <CreateGoalForm onGoalCreated={handleGoalCreated} />
+        </div>
+
+        {loading && <p>Loading goals...</p>}
+        {error && <p className="text-red-500">{error}</p>}
+
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {goals.map((goal) => (
+            <GoalCard key={goal.id} goal={goal} onDelete={handleDelete} onGoalUpdated={handleGoalUpdated} onComplete={handleCompleteGoal} onArchive={handleArchiveGoal} />
+          ))}
+        </div>
+
+        {!loading && goals.length === 0 && (
+          <p className="text-muted-foreground">
+            No goals yet. Create your first one 🌟
+          </p>
+        )}
+      </div>
+    </MainLayout>
+  );
+}
+
+export default Goals;

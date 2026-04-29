@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
     const userId = req.user.id
 
     const result = await pool.query(
-      "SELECT * FROM goal WHERE user_id = $1 ORDER BY created_at DESC",
+      "SELECT * FROM goal WHERE user_id = $1 AND is_active = TRUE ORDER BY created_at DESC",
       [userId]
     );
 
@@ -110,6 +110,38 @@ router.put("/:id", async (req, res) => {
   } catch (err) {
     console.error("Error updating goal:", err.message);
     res.status(500).json({ error: "Server error while updating goal" });
+  }
+});
+
+// Archive a goal
+router.put("/:id/archive", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    const result = await pool.query(
+      `
+      UPDATE goal
+      SET is_active = FALSE
+      WHERE id = $1
+        AND user_id = $2
+        AND completed = TRUE
+      RETURNING *
+      `,
+      [id, userId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(400).json({
+        error: "Goal not found or not completed"
+      });
+    }
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    console.error("Archive goal error:", err);
+    res.status(500).json({ error: "Failed to archive goal" });
   }
 });
 
