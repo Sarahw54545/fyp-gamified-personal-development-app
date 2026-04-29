@@ -66,15 +66,6 @@ function GoalCard({ goal, onDelete, onGoalUpdated, onComplete }) {
             />
           )}
 
-          {isCompleted && (
-            <Button
-              className="border border-indigo-600text-indigo-300hover:bg-indigo-600 hover:text-white"
-              onClick={() => onArchive(goal.id)}
-            >
-              Archive
-            </Button>
-          )}
-
           <DeleteGoalDialog
             goalTitle={goal.title}
             onConfirm={() => onDelete(goal.id)}

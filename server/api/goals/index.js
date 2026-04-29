@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
     const userId = req.user.id
 
     const result = await pool.query(
-      "SELECT * FROM goal WHERE user_id = $1 AND is_active = TRUE ORDER BY created_at DESC",
+      "SELECT * FROM goal WHERE user_id = $1 ORDER BY created_at DESC",
       [userId]
     );
 

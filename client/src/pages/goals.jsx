@@ -9,6 +9,12 @@ function Goals() {
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showArchived, setShowArchived] = useState(false);
+
+
+  const activeGoals = goals.filter(goal => goal.is_active);
+  const archivedGoals = goals.filter(goal => !goal.is_active);
+
 
   useEffect(() => {
     async function loadGoals() {
@@ -162,16 +168,51 @@ function Goals() {
         {loading && <p>Loading goals...</p>}
         {error && <p className="text-red-500">{error}</p>}
 
+        <h2 className="text-xl font-semibold">Active Goals</h2>
+
+        {activeGoals.length === 0 && !loading && (
+          <p className="text-muted-foreground">
+            No active goals. You’re all caught up ✨
+          </p>
+        )}
+
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {goals.map((goal) => (
-            <GoalCard key={goal.id} goal={goal} onDelete={handleDelete} onGoalUpdated={handleGoalUpdated} onComplete={handleCompleteGoal} onArchive={handleArchiveGoal} />
+          {activeGoals.map((goal) => (
+            <GoalCard
+              key={goal.id}
+              goal={goal}
+              onDelete={handleDelete}
+              onGoalUpdated={handleGoalUpdated}
+              onComplete={handleCompleteGoal}
+              onArchive={handleArchiveGoal}
+            />
           ))}
         </div>
 
-        {!loading && goals.length === 0 && (
-          <p className="text-muted-foreground">
-            No goals yet. Create your first one 🌟
-          </p>
+        {archivedGoals.length > 0 && (
+          <div className="mt-8">
+            <button
+              onClick={() => setShowArchived(prev => !prev)}
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition"
+            >
+              <span className="text-lg">
+                {showArchived ? "▾" : "▸"}
+              </span>
+              Completed Goals ({archivedGoals.length})
+            </button>
+
+            {showArchived && (
+              <div className="mt-4 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {archivedGoals.map((goal) => (
+                  <GoalCard
+                    key={goal.id}
+                    goal={goal}
+                    onDelete={handleDelete}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         )}
       </div>
     </MainLayout>
