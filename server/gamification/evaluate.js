@@ -79,13 +79,15 @@ export function evaluateGamification({
                 (tier) => !achievementState.completedTiers.includes(tier.threshold)
             );
 
+
             if (nextTier) {
                 progressedAchievements.push({
                     key: achievement.key,
-                    currentValue,
+                    currentValue: userState.counters[achievement.criteria.event] || 0,
                     nextThreshold: nextTier.threshold
                 });
             }
+
         }
     });
 

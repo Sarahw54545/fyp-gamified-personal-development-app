@@ -120,28 +120,33 @@ router.post("/:id/complete", async (req, res) => {
   const userId = req.user.id;
   const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 
+  const client = await pool.connect();
+
   try {
     // Start of Transaction
-    await pool.query("BEGIN");
+    await client.query("BEGIN");
 
     // 1. Mark goal as completed
-    const goalResult = await pool.query(
+    const goalResult = await client.query(
       `
       UPDATE goal
-      SET completed = TRUE
-      WHERE id = $1 AND user_id = $2 AND completed = FALSE
+      SET completed = TRUE,
+      is_active = FALSE
+      WHERE id = $1
+      AND user_id = $2
+      AND completed = FALSE
       RETURNING *
       `,
       [id, userId]
     );
 
     if (goalResult.rowCount === 0) {
-      await pool.query("ROLLBACK");
+      await client.query("ROLLBACK");
       return res.status(400).json({ error: "Goal not found or already completed" });
     }
 
     // 2. Increment GOAL_COMPLETED counter - On first completion insert a new row, later completions increment value by 1
-    await pool.query(
+    await client.query(
       `
       INSERT INTO user_counters (user_id, counter_key, value)
       VALUES ($1, 'GOAL_COMPLETED', 1)
@@ -153,9 +158,9 @@ router.post("/:id/complete", async (req, res) => {
 
     // 3. Load gamification state
     const [userResult, countersResult, achievementsResult] = await Promise.all([
-      pool.query(`SELECT total_xp FROM users WHERE id = $1`, [userId]),
-      pool.query(`SELECT counter_key, value FROM user_counters WHERE user_id = $1`, [userId]),
-      pool.query(
+      client.query(`SELECT total_xp FROM users WHERE id = $1`, [userId]),
+      client.query(`SELECT counter_key, value FROM user_counters WHERE user_id = $1`, [userId]),
+      client.query(
         `
         SELECT achievement_key, completed_tiers, last_completed_date
         FROM user_achievements
@@ -191,14 +196,14 @@ router.post("/:id/complete", async (req, res) => {
     });
 
     // 5. Persist XP
-    await pool.query(
+    await client.query(
       `UPDATE users SET total_xp = $1 WHERE id = $2`,
       [userState.totalXp, userId]
     );
 
     // 6. Persist achievement state
     for (const [key, state] of Object.entries(userState.achievements)) {
-      await pool.query(
+      await client.query(
         `
         INSERT INTO user_achievements (user_id, achievement_key, completed_tiers, last_completed_date)
         VALUES ($1, $2, $3, $4)
@@ -214,7 +219,7 @@ router.post("/:id/complete", async (req, res) => {
       );
     }
 
-    await pool.query("COMMIT"); // End of Successful Transaction
+    await client.query("COMMIT"); // End of Successful Transaction
 
     res.json({
       success: true,
@@ -223,9 +228,12 @@ router.post("/:id/complete", async (req, res) => {
     });
 
   } catch (err) {
-    await pool.query("ROLLBACK"); // Rollback Transaction if Error Occurs
+    await client.query("ROLLBACK"); // Rollback Transaction if Error Occurs
     console.error("Goal completion error:", err);
     res.status(500).json({ error: "Failed to complete goal" });
+  }
+  finally {
+    client.release();
   }
 });
 

@@ -2,7 +2,7 @@
  * Calculate user level using quadratic XP progression.
  *
  * XP required for next level:
- *   baseXP * (level - 1)^2
+ *   baseXP * (level)^2
  *
  * Level 1 starts at 0 XP.
  * 
@@ -17,8 +17,8 @@ export function calculateLevel(totalXp, baseXp = 50) {
     let xpGained = 0;
 
     while (true) {
-        // Calculated based on quadratic formula (baseXP * (level - 1)^2)
-        const xpForNextLevel = baseXp * Math.pow(level - 1, 2);
+        // Calculated based on quadratic formula (baseXP * (level)^2)
+        const xpForNextLevel = baseXp * Math.pow(level, 2);
 
         // If the user doesn't have enough XP earned to go to the next level, stop
         if (totalXp < xpGained + xpForNextLevel) {
