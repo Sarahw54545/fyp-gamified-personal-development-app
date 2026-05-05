@@ -6,6 +6,8 @@ import CreateGoalForm from "../components/goals/createGoalForm";
 import OverdueGoalsWidget from "../components/goals/overdueGoalsWidget"
 import { toast } from 'sonner';
 import { Input } from "@/components/ui/input"
+import { getActiveGoals, getArchivedGoals, getOverdueGoals, getGoalsDueThisWeek } from "@/lib/goals";
+
 
 function Goals() {
   const [goals, setGoals] = useState([]);
@@ -15,15 +17,11 @@ function Goals() {
   const [search, setSearch] = useState("");
 
 
-  const activeGoals = goals.filter(goal => goal.is_active && !goal.completed);
-  const archivedGoals = goals.filter(goal => !goal.is_active);
+  const activeGoals = getActiveGoals(goals);
+  const archivedGoals = getArchivedGoals(goals);
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const endOfWeek = new Date(today);
-  endOfWeek.setDate(today.getDate() + (7 - today.getDay()));
-
+const overdueGoals = getOverdueGoals(activeGoals);
+const dueThisWeek = getGoalsDueThisWeek(activeGoals);
 
   useEffect(() => {
     async function loadGoals() {
@@ -48,19 +46,6 @@ function Goals() {
   const visibleGoals = search.trim()
     ? filteredGoals
     : activeGoals;
-
-
-  const dueThisWeek = activeGoals.filter(goal => {
-    if (!goal.due_date) return false;
-    const due = new Date(goal.due_date);
-    return due >= today && due <= endOfWeek;
-  });
-
-  const overdueGoals = activeGoals.filter(goal => {
-    if (!goal.due_date) return false;
-    const due = new Date(goal.due_date);
-    return due < today;
-  });
 
   // Add goal to state immediately after creation
   const handleGoalCreated = (newGoal) => {
@@ -116,36 +101,6 @@ function Goals() {
       </div>
     ));
   }
-
-  /*
-  const handleArchiveGoal = async (id) => {
-    try {
-      const archivedGoal = await apiFetch(`/api/goals/${id}/archive`, {
-        method: "PUT"
-      });
-
-      setGoals(prev =>
-        prev.filter(goal => goal.id !== archivedGoal.id)
-      );
-
-      toast.custom(() => (
-        <div className="p-4">
-          <strong>Goal Archived 📦</strong>
-          <p>The goal has been archived.</p>
-        </div>
-      ));
-
-    } catch (err) {
-      console.error(err);
-      toast.custom(() => (
-        <div className="p-4">
-          <strong>Error</strong>
-          <p>Failed to archive goal.</p>
-        </div>
-      ));
-    }
-  };
-  */
 
   const handleCompleteGoal = async (id) => {
     try {

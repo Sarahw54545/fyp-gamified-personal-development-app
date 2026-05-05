@@ -13,15 +13,7 @@ import {
     CarouselNext,
 } from "@/components/ui/carousel";
 import GoalCard from "./goalCard";
-
-
-function chunkArray(array, size) {
-    const chunks = [];
-    for (let i = 0; i < array.length; i += size) {
-        chunks.push(array.slice(i, i + size));
-    }
-    return chunks;
-}
+import { chunkArray } from "@/lib/utils";
 
 function OverdueGoalsWidget({ goals, onDelete, onComplete, onGoalUpdated }) {
     const pages = useMemo(() => chunkArray(goals, 2), [goals]);

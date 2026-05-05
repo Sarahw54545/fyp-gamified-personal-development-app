@@ -10,15 +10,14 @@ import {
 import { Button } from "@/components/ui/button";
 import DeleteGoalDialog from "./deleteGoalDialog";
 import EditGoalForm from "./editGoalForm"
+import { startOfToday, getRelativeDueText } from "@/lib/dates";
 
 function GoalCard({ goal, onDelete, onGoalUpdated, onComplete }) {
   const [expanded, setExpanded] = useState(false);
   const isCompleted = goal.completed;
   const isArchived = !goal.is_active;
 
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = startOfToday();
 
   const hasDueDate = !!goal.due_date;
   const dueDate = hasDueDate ? new Date(goal.due_date) : null;
@@ -28,40 +27,11 @@ function GoalCard({ goal, onDelete, onGoalUpdated, onComplete }) {
     !goal.completed &&
     dueDate < today;
 
-  const MS_PER_DAY = 1000 * 60 * 60 * 24;
-
-  function getRelativeDueText(dueDate) {
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
-
-    const diffDays = Math.ceil((dueDate - now) / MS_PER_DAY);
-
-    switch (true) {
-      case diffDays < 0:
-        return "⚠️ Overdue";
-
-      case diffDays === 0:
-        return "📅 Due today";
-
-      case diffDays < 30:
-        return `📅 Due in ${diffDays} day${diffDays > 1 ? "s" : ""}`;
-
-      case diffDays < 365: {
-        const months = Math.round(diffDays / 30);
-        return `📅 Due in ${months} month${months > 1 ? "s" : ""}`;
-      }
-
-      default: {
-        const years = Math.round(diffDays / 365);
-        return `📅 Due in ${years} year${years > 1 ? "s" : ""}`;
-      }
-    }
-  }
   return (
 
     <Card className={`bg-slate-900 border-slate-800 transition-all duration-300 flex flex-col ${isOverdue ? "hover:border-red-500/60 border-red-950 hover:shadow-[0_0_20px_rgba(239,68,68,0.45)] bg-red-950/20" : "border-slate-800"} ${!isCompleted && !isOverdue && "hover:border-indigo-500 hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]"}`}>
 
-      <CardHeader className= {isCompleted ? "opacity-60 overflow-hidden" : "overflow-hidden"}>
+      <CardHeader className={isCompleted ? "opacity-60 overflow-hidden" : "overflow-hidden"}>
 
 
         <CardTitle className="flex items-start gap-2 text-lg leading-snug">
@@ -107,7 +77,7 @@ function GoalCard({ goal, onDelete, onGoalUpdated, onComplete }) {
           </p>
 
           {!expanded && goal.description?.length > 120 && (
-            <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-slate-900"/>
+            <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-slate-900" />
           )}
         </div>
 

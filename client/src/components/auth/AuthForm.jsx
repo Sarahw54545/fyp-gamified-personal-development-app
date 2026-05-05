@@ -3,16 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { apiFetch } from "@/services/apiClient";
 import { useAuth } from "@/hooks/use-Auth";
 import { Eye, EyeOff } from "lucide-react";
-
-function getPasswordStrength(password) {
-  if (!password) return { label: "", value: 0 };
-  const hasNumber = /\d/.test(password);
-  const hasSymbol = /[^a-zA-Z0-9]/.test(password);
-  if (password.length < 8) return { label: "Weak", value: 25 };
-  if (!hasNumber) return { label: "Medium", value: 50 };
-  if (!hasSymbol) return { label: "Strong", value: 75 };
-  return { label: "Very strong", value: 100 };
-}
+import { getPasswordStrength } from "@/lib/password";
 
 function AuthForm({ mode }) {
   const isSignup = mode === "signup";
