@@ -222,12 +222,24 @@ function Goals() {
               <CreateGoalForm onGoalCreated={handleGoalCreated} />
             </div>
 
-            {/* Empty State */}
-            {visibleGoals.length === 0 && !loading && (
+
+
+            {/* Empty States */}
+            {!loading && activeGoals.length === 0 && (
               <p className="text-muted-foreground">
-                No matching goals found ✨
+                No Active Goals Right Now 🎉
               </p>
             )}
+
+            {!loading &&
+              activeGoals.length > 0 &&
+              visibleGoals.length === 0 && (
+                <p className="text-muted-foreground">
+                  No Matching Goals Found ✨
+                </p>
+              )}
+
+
 
             {/* Active Goals Grid */}
             <div className="grid gap-6 md:grid-cols-2">
@@ -260,7 +272,7 @@ function Goals() {
 
           {dueThisWeek.length === 0 ? (
             <p className="text-sm text-muted-foreground mt-2">
-              No goals due in the next 7 days 🎉
+              No Goals Due in the Next 7 Days 🎉
             </p>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mt-4">

@@ -108,8 +108,8 @@ function OverdueGoalsWidget({ goals, onDelete, onComplete, onGoalUpdated }) {
                                         <span
                                             key={index}
                                             className={`h-2 w-2 rounded-full transition-all duration-300 ${index === activeIndex
-                                                    ? "bg-indigo-400 scale-110"
-                                                    : "bg-slate-600"
+                                                ? "bg-indigo-400 scale-110"
+                                                : "bg-slate-600"
                                                 }`}
                                         />
                                     ))}
