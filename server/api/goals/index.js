@@ -25,7 +25,7 @@ router.get("/", async (req, res) => {
 // Create a Goal
 router.post("/", async (req, res) => {
   try {
-    const { title, description } = req.body;
+    const { title, description, due_date } = req.body;
     const userId = req.user.id
 
     if (!title || title.trim() === "") {
@@ -34,14 +34,15 @@ router.post("/", async (req, res) => {
 
     const newGoal = await pool.query(
       `
-      INSERT INTO goal (title, description, user_id)
-      VALUES ($1, $2, $3)
+      INSERT INTO goal (title, description, due_date, user_id)
+      VALUES ($1, $2, $3, $4)
       RETURNING *
       `,
       [
         title,
-        description,
-        userId || null
+        description || null,
+        due_date || null,
+        userId
       ]
     );
 
@@ -83,7 +84,7 @@ router.delete("/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description } = req.body;
+    const { title, description, due_date } = req.body;
 
     // Validation
     if (!title || title.trim() === "") {
@@ -94,11 +95,12 @@ router.put("/:id", async (req, res) => {
       `
       UPDATE goal
       SET title = $1,
-          description = $2
-      WHERE id = $3 AND is_active = TRUE
+          description = $2,
+          due_date = $3
+      WHERE id = $4 AND is_active = TRUE
       RETURNING *
       `,
-      [title, description || null, id]
+      [title, description || null, due_date || null, id]
     );
 
     if (updatedGoal.rows.length === 0) {

@@ -3,17 +3,26 @@ import MainLayout from "../components/layout/mainLayout";
 import { apiFetch } from "@/services/apiClient";
 import GoalCard from "../components/goals/goalCard.jsx";
 import CreateGoalForm from "../components/goals/createGoalForm";
+import OverdueGoalsWidget from "../components/goals/overdueGoalsWidget"
 import { toast } from 'sonner';
+import { Input } from "@/components/ui/input"
 
 function Goals() {
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showArchived, setShowArchived] = useState(false);
+  const [search, setSearch] = useState("");
 
 
-  const activeGoals = goals.filter(goal => goal.is_active);
+  const activeGoals = goals.filter(goal => goal.is_active && !goal.completed);
   const archivedGoals = goals.filter(goal => !goal.is_active);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const endOfWeek = new Date(today);
+  endOfWeek.setDate(today.getDate() + (7 - today.getDay()));
 
 
   useEffect(() => {
@@ -30,6 +39,28 @@ function Goals() {
 
     loadGoals();
   }, []);
+
+  const filteredGoals = activeGoals.filter(goal =>
+    goal.title.toLowerCase().includes(search.toLowerCase())
+  );
+
+
+  const visibleGoals = search.trim()
+    ? filteredGoals
+    : activeGoals;
+
+
+  const dueThisWeek = activeGoals.filter(goal => {
+    if (!goal.due_date) return false;
+    const due = new Date(goal.due_date);
+    return due >= today && due <= endOfWeek;
+  });
+
+  const overdueGoals = activeGoals.filter(goal => {
+    if (!goal.due_date) return false;
+    const due = new Date(goal.due_date);
+    return due < today;
+  });
 
   // Add goal to state immediately after creation
   const handleGoalCreated = (newGoal) => {
@@ -86,6 +117,7 @@ function Goals() {
     ));
   }
 
+  /*
   const handleArchiveGoal = async (id) => {
     try {
       const archivedGoal = await apiFetch(`/api/goals/${id}/archive`, {
@@ -113,6 +145,7 @@ function Goals() {
       ));
     }
   };
+  */
 
   const handleCompleteGoal = async (id) => {
     try {
@@ -160,37 +193,91 @@ function Goals() {
     <MainLayout>
       <div className="space-y-6">
 
+        {/* Header */}
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">Your Goals 🚀</h1>
-          <CreateGoalForm onGoalCreated={handleGoalCreated} />
         </div>
 
         {loading && <p>Loading goals...</p>}
         {error && <p className="text-red-500">{error}</p>}
 
-        <h2 className="text-xl font-semibold">Active Goals</h2>
+        {/* Active Goals Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 
-        {activeGoals.length === 0 && !loading && (
-          <p className="text-muted-foreground">
-            No active goals. You’re all caught up ✨
-          </p>
-        )}
+          {/* LEFT COLUMN (everything except overdue) */}
+          <div className="lg:col-span-2 space-y-6">
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {activeGoals.map((goal) => (
-            <GoalCard
-              key={goal.id}
-              goal={goal}
-              onDelete={handleDelete}
-              onGoalUpdated={handleGoalUpdated}
-              onComplete={handleCompleteGoal}
-              onArchive={handleArchiveGoal}
-            />
-          ))}
+            {/* Active Goals Heading */}
+            <h2 className="text-xl font-semibold">Active Goals</h2>
+
+            {/* Search + Add */}
+            <div className="flex items-center gap-4">
+              <div className="w-[220px]">
+                <Input
+                  placeholder="Search Goals…"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
+              <CreateGoalForm onGoalCreated={handleGoalCreated} />
+            </div>
+
+            {/* Empty State */}
+            {visibleGoals.length === 0 && !loading && (
+              <p className="text-muted-foreground">
+                No matching goals found ✨
+              </p>
+            )}
+
+            {/* Active Goals Grid */}
+            <div className="grid gap-6 md:grid-cols-2">
+              {visibleGoals.map(goal => (
+                <GoalCard
+                  key={goal.id}
+                  goal={goal}
+                  onDelete={handleDelete}
+                  onGoalUpdated={handleGoalUpdated}
+                  onComplete={handleCompleteGoal}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* RIGHT COLUMN (Overdue) */}
+
+          <div className="self-start">
+            <OverdueGoalsWidget goals={overdueGoals} onDelete={handleDelete} onComplete={handleCompleteGoal} onGoalUpdated={handleGoalUpdated} />
+          </div>
+
+
         </div>
 
+        {/* Due This Week */}
+        <div>
+          <h3 className="text-lg font-semibold mt-8">
+            Due This Week
+          </h3>
+
+          {dueThisWeek.length === 0 ? (
+            <p className="text-sm text-muted-foreground mt-2">
+              No goals due in the next 7 days 🎉
+            </p>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mt-4">
+              {dueThisWeek.map(goal => (
+                <GoalCard
+                  key={goal.id}
+                  goal={goal}
+                  variant="highlight"
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Archived Goals */}
         {archivedGoals.length > 0 && (
-          <div className="mt-8">
+          <div className="mt-10">
             <button
               onClick={() => setShowArchived(prev => !prev)}
               className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition"
@@ -203,7 +290,7 @@ function Goals() {
 
             {showArchived && (
               <div className="mt-4 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {archivedGoals.map((goal) => (
+                {archivedGoals.map(goal => (
                   <GoalCard
                     key={goal.id}
                     goal={goal}

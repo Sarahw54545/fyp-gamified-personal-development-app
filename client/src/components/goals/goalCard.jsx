@@ -1,3 +1,4 @@
+import { useState } from "react"
 import {
   Card,
   CardHeader,
@@ -11,35 +12,117 @@ import DeleteGoalDialog from "./deleteGoalDialog";
 import EditGoalForm from "./editGoalForm"
 
 function GoalCard({ goal, onDelete, onGoalUpdated, onComplete }) {
+  const [expanded, setExpanded] = useState(false);
   const isCompleted = goal.completed;
   const isArchived = !goal.is_active;
 
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const hasDueDate = !!goal.due_date;
+  const dueDate = hasDueDate ? new Date(goal.due_date) : null;
+
+  const isOverdue =
+    hasDueDate &&
+    !goal.completed &&
+    dueDate < today;
+
+  const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+  function getRelativeDueText(dueDate) {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    const diffDays = Math.ceil((dueDate - now) / MS_PER_DAY);
+
+    switch (true) {
+      case diffDays < 0:
+        return "⚠️ Overdue";
+
+      case diffDays === 0:
+        return "📅 Due today";
+
+      case diffDays < 30:
+        return `📅 Due in ${diffDays} day${diffDays > 1 ? "s" : ""}`;
+
+      case diffDays < 365: {
+        const months = Math.round(diffDays / 30);
+        return `📅 Due in ${months} month${months > 1 ? "s" : ""}`;
+      }
+
+      default: {
+        const years = Math.round(diffDays / 365);
+        return `📅 Due in ${years} year${years > 1 ? "s" : ""}`;
+      }
+    }
+  }
   return (
 
-    <Card className={`bg-slate-900 border-slate-800 transition-all duration-300 ${!isCompleted && "hover:border-indigo-500 hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]"}`}>
+    <Card className={`bg-slate-900 border-slate-800 transition-all duration-300 flex flex-col ${isOverdue ? "hover:border-red-500/60 border-red-950 hover:shadow-[0_0_20px_rgba(239,68,68,0.45)] bg-red-950/20" : "border-slate-800"} ${!isCompleted && !isOverdue && "hover:border-indigo-500 hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]"}`}>
 
-      <CardHeader className={isCompleted ? "opacity-60" : ""}>
+      <CardHeader className= {isCompleted ? "opacity-60 overflow-hidden" : "overflow-hidden"}>
 
-        <CardTitle className="flex items-center gap-2 text-lg">
-          {isCompleted && <span>✅</span>}
-          <span className={isCompleted ? "line-through" : ""}>
+
+        <CardTitle className="flex items-start gap-2 text-lg leading-snug">
+          {isCompleted && <span className="mt-0.5">✅</span>}
+          <span
+            className={`block break-words whitespace-normal line-clamp-2 ${isCompleted ? "line-through" : ""
+              }`}
+          >
             {goal.title}
           </span>
         </CardTitle>
 
+
+
+
+        {hasDueDate && !isCompleted && (
+          <p
+            className={`text-xs mb-2 ${isOverdue ? "text-red-400 font-medium" : "text-muted-foreground"
+              }`}
+          >
+            {getRelativeDueText(dueDate)}
+          </p>
+        )}
+
+
         <CardDescription>
-          {goal.category || "Personal Goal"}
+          <p className={`text-sm line-clamp-3 ${isOverdue ? "text-slate-200" : "text-muted-foreground"}`}>
+            {goal.category || "Personal Goal"}
+          </p>
         </CardDescription>
       </CardHeader>
 
       <CardContent className={isCompleted ? "opacity-60" : ""}>
-        <p className="text-sm text-muted-foreground mb-4">
-          {goal.description}
-        </p>
+        <div
+          className={`relative transition-all ${expanded ? "max-h-none" : "max-h-[4.5rem] overflow-hidden"
+            }`}
+        >
+          <p
+            className={`text-sm whitespace-pre-wrap break-words ${isOverdue ? "text-slate-200" : "text-muted-foreground"
+              }`}
+          >
+            {goal.description}
+          </p>
+
+          {!expanded && goal.description?.length > 120 && (
+            <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-slate-900"/>
+          )}
+        </div>
+
+        {goal.description?.length > 120 && (
+          <button
+            type="button"
+            onClick={() => setExpanded((p) => !p)}
+            className="mt-2 text-xs text-indigo-400 hover:text-indigo-300"
+          >
+            {expanded ? "Show less" : "Read more"}
+          </button>
+        )}
       </CardContent>
 
-      <CardFooter className="flex items-center justify-between gap-3">
+      <CardFooter className="mt-auto flex items-center justify-between gap-3">
 
         {!isCompleted ? (
           <Button
