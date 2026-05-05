@@ -1,8 +1,8 @@
-import { getLevelFromXp, getLevelTitle } from "./xp";
+import { getLevelTitle } from "./xp";
 
-export function getUserLevelInfo(totalXp) {
-  const level = getLevelFromXp(totalXp);
+export function getUserDisplayInfo({ email, level }) {
   return {
+    email,
     level,
     title: getLevelTitle(level)
   };

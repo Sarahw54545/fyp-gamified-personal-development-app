@@ -3,10 +3,13 @@ import { Progress } from "@/components/ui/progress";
 import { getLevelProgress } from "@/lib/xp";
 
 export function XPWidget({ gamification }) {
-  const { totalXp } = gamification;
+  const { totalXp, level, nextLevelXp } = gamification;
 
-  const { level, progress, nextLevelXp } =
-    getLevelProgress(totalXp);
+  const progress = getLevelProgress({
+    totalXp,
+    level,
+    nextLevelXp
+  });
 
   return (
     <Card className="bg-slate-900 border-slate-800">

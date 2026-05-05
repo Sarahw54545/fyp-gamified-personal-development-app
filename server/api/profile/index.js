@@ -54,6 +54,7 @@ router.get("/", async (req, res) => {
 
     // 4. Derive level from total XP
     const level = GamificationEngine.calculateLevel(user.total_xp);
+    const nextLevelXp = GamificationEngine.xpForNextLevel(level);
 
     // 5. Merge static achievement definitions with user progress
     const achievementsWithProgress = achievements.map(def => {
@@ -110,6 +111,7 @@ router.get("/", async (req, res) => {
       gamification: {
         totalXp: user.total_xp,
         level,
+        nextLevelXp,
         achievements: achievementsWithProgress
       }
     });
