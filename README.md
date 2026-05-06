@@ -1,74 +1,164 @@
-# Gamified Personal Development App - Final Year Project
+# Stellara 🌟
+### A Gamified Personal Development Platform
 
-## :memo: Description
+Stellara is a full‑stack web application designed to help users build and maintain positive habits through **meaningful gamification**.  
+Rather than focusing on competition, Stellara encourages **consistency, reflection, and long‑term engagement** using experience points (XP), levels, achievements, and visual progress feedback.
 
-A full-stack web application designed to help users build and maintain positive habits through gamification techniques such as XP, levels, and achievements.
-
-This project is being developed as part of a Final Year Project and follows an iterative, Agile-based development approach.
-
----
-
-## :jigsaw: Features
-_Current (POC 1):_
-- Full-stack "Hello World" proof of concept
-- React frontend fetching data from backend API
-- Express.js backend serving REST API endpoints
-- PostgreSQL database connection and test query
-
-_Planned:_
-- Habit and goal creation
-- Gamified progression system (XP, levels, achievements)
-- User authentication and personalisation
-- Progress tracking dashboards and statistics
+This project was developed as a **Final Year Project (BSc (Hons) Creative Computing)** and follows professional software engineering practices including Agile development, CI/CD, and modular backend architecture.
 
 ---
 
-## :hammer_and_wrench: Tech Stack
-- **Frontend:** React.js (Vite)
-- **Backend:** Node.js + Express.js
-- **Database:** PostgreSQL
-- **Authentication:** JWT
-- **Hosting:** Vercel (Frontend), Render (Backend)
+## ✨ Key Features
 
+### ✅ Goal & Habit Management
+- Create, edit, delete, and complete personal goals
+- Active, completed, and archived goal states
+- Real‑time UI updates without page refresh
+
+### ✅ Gamification System
+- Experience Points (XP) awarded through achievements
+- Dynamic level progression derived from XP
+- **Daily achievements** to reinforce consistency
+- **Progressive achievements** to reward long‑term engagement
+- Backend‑driven, event‑based progression logic
+
+### ✅ Dashboards & Visual Feedback
+- Action‑focused daily dashboard
+- XP progress bar and level indicators
+- Daily achievements and current streak tracking
+- Reflective profile view with long‑term statistics
+
+### ✅ Authentication & Security
+- Secure JWT‑based authentication
+- User‑specific data isolation
+- Protected API routes
 
 ---
 
-## :rocket: Getting Started
+## 🧠 Gamification Philosophy
+
+Stellara’s gamification system is informed by **Self‑Determination Theory** and focuses on:
+- **Autonomy** — users set their own goals
+- **Competence** — visible progression and mastery
+- **Consistency** — daily reinforcement without pressure
+
+Competitive elements such as leaderboards were intentionally excluded to avoid discouraging long‑term engagement.
+
+---
+
+## 🏗️ Architecture Overview
+
+Stellara follows a **client–server architecture** with a clear separation of concerns:
+
+- **Frontend:** Presentation & user interaction  
+- **Backend:** Business logic, authentication, and gamification engine  
+- **Database:** Persistent storage and progression state  
+
+All gamification rules are evaluated on the **backend**, making the frontend a pure visual renderer and preventing duplicated logic.
+
+---
+
+## 🧰 Tech Stack
+
+### Frontend
+- React (Vite)
+- Tailwind CSS
+- shadcn/ui
+
+### Backend
+- Node.js
+- Express.js
+- JSON Web Tokens (JWT)
+
+### Database
+- PostgreSQL (hosted via Supabase)
+
+### Deployment
+- **Frontend:** Vercel
+- **Backend:** Render
+
+---
+
+## 🚀 Live Deployment
+
+- **Frontend:** https://fyp-gamified-personal-development-a.vercel.app/
+- **Backend API:** https://fyp-gamified-personal-development-app.onrender.com/
+
+---
+
+## ⚙️ Getting Started (Local Development)
 
 ### Prerequisites
 - Node.js (v18+ recommended)
-- npm or yarn
-- PostgreSQL (local or cloud-based)
+- npm
+- PostgreSQL (local or cloud‑hosted)
 
-### Setup
-1. Clone the repo
+### Installation
+
+1. Clone the repository:
 ```bash
-git clone https://github.com/<your-username>/gamified-personal-development-app.git
-````
+git clone https://github.com/Sarahw54545/fyp-gamified-personal-development-app.git
+```
+2. Install dependencies:
+- **Frontend**
+```bash
+cd client
+npm install
+```
+- **Backend**
+```bash
+cd server
+npm install
+```
+4. Configure environment variables
+- Create .env files in both /client and /server directories as required.
 
-2. Install npm packages
-    2.1 Frontend
-    ```bash
-    cd client
-    npm install
-    ````
-    2.2 Backend
-    ```bash
-    cd server
-    npm install
-    ````
+6. Run the application locally:
+- **Frontend**
+```bash
+npm run dev
+```
+- **Backend**
+```bash
+npm run dev
+```
 
-3. Configure Environment Variables
-Create .env files in both /server and /client as required
+---
 
-4. Run the Application Locally
-    2.1 Frontend
-    ```bash
-    cd client
-    npm run dev
-    ````
-    2.2 Backend
-    ```bash
-    cd server
-    npm run dev
-    ````
+## 📦 Related Projects
+
+### Gamification Engine Library
+
+The gamification logic used in Stellara is designed as a **modular backend engine** and has been published as a standalone repository for public use.
+
+➡️ **Gamification Engine Repository:**  
+*(Coming soon — documentation and usage guide will be provided)*
+
+This engine can be reused in other applications that require achievement‑based progression systems.
+
+---
+
+## 📈 Development Methodology
+
+Development followed an **Agile, sprint‑based workflow** with:
+
+- Issue‑driven development using GitHub Issues
+- Feature branches and pull requests
+- Weekly sprint reviews and iterative refinement
+- Continuous Integration & Deployment (CI/CD)
+
+Each sprint delivered a testable, deployable increment of the application.
+
+---
+
+## 👩‍💻 Author
+
+**Sarah Walsh**  
+BSc (Hons) Creative Computing  
+Final Year Project – 2026  
+
+---
+
+## 📄 License
+
+This project was developed for academic purposes.
