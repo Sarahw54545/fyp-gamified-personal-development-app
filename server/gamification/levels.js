@@ -32,3 +32,7 @@ export function calculateLevel(totalXp, baseXp = 50) {
 
     return level;
 }
+
+export function xpForNextLevel(level, baseXp = 50) {
+  return baseXp * Math.pow(level, 2);
+}

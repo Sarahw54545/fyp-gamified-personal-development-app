@@ -22,10 +22,10 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Create a Goal
+// Create a Goal + Trigger Gamification
 router.post("/", async (req, res) => {
   try {
-    const { title, description } = req.body;
+    const { title, description, due_date } = req.body;
     const userId = req.user.id
 
     if (!title || title.trim() === "") {
@@ -34,16 +34,112 @@ router.post("/", async (req, res) => {
 
     const newGoal = await pool.query(
       `
-      INSERT INTO goal (title, description, user_id)
-      VALUES ($1, $2, $3)
+      INSERT INTO goal (title, description, due_date, user_id)
+      VALUES ($1, $2, $3, $4)
       RETURNING *
       `,
       [
         title,
-        description,
-        userId || null
+        description || null,
+        due_date || null,
+        userId
       ]
     );
+
+    const now = new Date();
+    const today = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
+
+    // 2. Load counters
+    const countersRes = await pool.query(
+      `SELECT counter_key, value FROM user_counters WHERE user_id = $1`,
+      [userId]
+    );
+
+    // 3. Load user achievements
+    const achievementsRes = await pool.query(
+      `
+  SELECT achievement_key, completed_tiers, last_completed_date
+  FROM user_achievements
+  WHERE user_id = $1
+  `,
+      [userId]
+    );
+
+    // 4. Load user XP
+    const userRes = await pool.query(
+      `SELECT total_xp FROM users WHERE id = $1`,
+      [userId]
+    );
+
+    // 5. Build userState
+    const userState = {
+      userId,
+      totalXp: userRes.rows[0]?.total_xp ?? 0,
+      counters: Object.fromEntries(
+        countersRes.rows.map(c => [c.counter_key, c.value])
+      ),
+      achievements: Object.fromEntries(
+        achievementsRes.rows.map(a => [
+          a.achievement_key,
+          {
+            completedTiers: a.completed_tiers || [],
+            lastCompletedDate: a.last_completed_date
+          }
+        ])
+      )
+    };
+
+    // 6. Evaluate gamification
+    const gamificationResult = GamificationEngine.evaluateGamification({
+      userState,
+      event: { type: "GOAL_CREATED" },
+      achievements,
+      today
+    });
+
+    // 7. Persist XP
+    await pool.query(
+      `UPDATE users SET total_xp = $1 WHERE id = $2`,
+      [userState.totalXp, userId]
+    );
+
+    // 8. Persist achievement state
+    for (const [key, state] of Object.entries(userState.achievements)) {
+      await pool.query(
+        `
+    INSERT INTO user_achievements
+      (user_id, achievement_key, completed_tiers, last_completed_date)
+    VALUES ($1, $2, $3, $4)
+    ON CONFLICT (user_id, achievement_key)
+    DO UPDATE SET
+      completed_tiers = $3,
+      last_completed_date = $4
+    `,
+        [
+          userId,
+          key,
+          state.completedTiers || [],
+          state.lastCompletedDate || null
+        ]
+      );
+    }
+
+    // 9. Persist counters
+    for (const [key, value] of Object.entries(userState.counters)) {
+      await pool.query(
+        `
+    INSERT INTO user_counters (user_id, counter_key, value)
+    VALUES ($1, $2, $3)
+    ON CONFLICT (user_id, counter_key)
+    DO UPDATE SET value = $3
+    `,
+        [userId, key, value]
+      );
+    }
 
     res.status(201).json(newGoal.rows[0]);
 
@@ -83,7 +179,7 @@ router.delete("/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description } = req.body;
+    const { title, description, due_date } = req.body;
 
     // Validation
     if (!title || title.trim() === "") {
@@ -94,11 +190,12 @@ router.put("/:id", async (req, res) => {
       `
       UPDATE goal
       SET title = $1,
-          description = $2
-      WHERE id = $3 AND is_active = TRUE
+          description = $2,
+          due_date = $3
+      WHERE id = $4 AND is_active = TRUE
       RETURNING *
       `,
-      [title, description || null, id]
+      [title, description || null, due_date || null, id]
     );
 
     if (updatedGoal.rows.length === 0) {
@@ -113,12 +210,50 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+// Archive a goal
+router.put("/:id/archive", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    const result = await pool.query(
+      `
+      UPDATE goal
+      SET is_active = FALSE
+      WHERE id = $1
+        AND user_id = $2
+        AND completed = TRUE
+      RETURNING *
+      `,
+      [id, userId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(400).json({
+        error: "Goal not found or not completed"
+      });
+    }
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    console.error("Archive goal error:", err);
+    res.status(500).json({ error: "Failed to archive goal" });
+  }
+});
+
 // Complete a goal + trigger gamification
 router.post("/:id/complete", async (req, res) => {
 
   const { id } = req.params;
   const userId = req.user.id;
-  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+  const now = new Date();
+  const today = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate()
+  );
 
   const client = await pool.connect();
 

@@ -4,6 +4,8 @@ import cors from "cors";
 import { authenticateToken } from "./middleware/authMiddleware.js";
 import goalsRouter from "./api/goals/index.js"
 import authRouter from "./api/auth/index.js"
+import dashboardRouter from "./api/dashboard/index.js";
+import achievementsRouter from "./api/achievements/index.js";
 import profileRouter from "./api/profile/index.js";
 import {pool} from "./db.js"
 
@@ -17,8 +19,10 @@ pool.query("SELECT NOW()")
 .then(() => console.log("PostgreSQL Connected"))
 .catch(err => console.error("PostgreSQL connection error", err));
 
-app.use("/api/goals", authenticateToken, goalsRouter);
 app.use("/api/auth", authRouter)
+app.use("/api/dashboard", authenticateToken, dashboardRouter);
+app.use("/api/goals", authenticateToken, goalsRouter);
+app.use("/api/achievements", authenticateToken, achievementsRouter);
 app.use("/api/profile", authenticateToken, profileRouter);
 
 const PORT = process.env.PORT || 5000;

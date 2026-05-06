@@ -63,7 +63,7 @@ function Navbar() {
 
   return (
     <Sidebar variant="floating" collapsible="icon">
-      <SidebarHeader className="p-4 flex justify-center">
+      <SidebarHeader className="bg-slate-900 border-slate-800 p-4 flex justify-center">
         <Link to="/dashboard">
           {state === "collapsed" ? (
 
@@ -85,7 +85,7 @@ function Navbar() {
         </Link>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="bg-slate-900 border-slate-800">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -104,7 +104,7 @@ function Navbar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter>
+      <SidebarFooter className="bg-slate-900 border-slate-800">
         <SidebarMenu>
           {options.Footer.map((item) => (
             <SidebarMenuItem key={item.title}>

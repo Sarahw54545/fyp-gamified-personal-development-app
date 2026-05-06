@@ -10,14 +10,16 @@ function MainLayout({ children }) {
         <Navbar />
 
         <header className="sticky top-0 h-20 flex items-center">
-            <SidebarTrigger />
+          <SidebarTrigger />
         </header>
 
         <main className="flex-1 p-8">
           {children}
         </main>
-        
-        <Toaster />
+
+
+        <Toaster position="bottom-right" expand={true} richColors closeButton />
+
 
       </div>
     </SidebarProvider>

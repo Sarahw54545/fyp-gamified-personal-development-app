@@ -1,53 +1,46 @@
 import { useEffect, useState } from "react";
-import MainLayout from "@/components/layout/mainLayout";
+import MainLayout from "../components/layout/mainLayout";
 import { apiFetch } from "@/services/apiClient";
-import { Skeleton } from "@/components/ui/skeleton";
 
-import { XPWidget } from "@/components/profile/XPWidget";
-import { AchievementGrid } from "@/components/profile/AchievementGrid";
+import { ProfileHero } from "../components/profile/profileHero";
+import { GoalsStats } from "../components/profile/goalsStats";
+import { AchievementsStats } from "../components/profile/achievementsStats";
+import { ActivityStats } from "../components/profile/activityStats";
 
 function Profile() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     async function loadProfile() {
-      try {
-        const data = await apiFetch("/api/profile");
-        setProfile(data);
-      } catch (err) {
-        setError(err.message || "Failed to load profile");
-      } finally {
-        setLoading(false);
-      }
+      const data = await apiFetch("/api/profile");
+      setProfile(data);
+      setLoading(false);
     }
 
     loadProfile();
   }, []);
 
+  if (loading) {
+    return (
+      <MainLayout>
+        <p>Loading profile...</p>
+      </MainLayout>
+    );
+  }
+
   return (
     <MainLayout>
       <div className="space-y-8">
+        <h1 className="text-3xl font-bold p-mt">Your Profile ✨</h1>
 
-        <h1 className="text-3xl font-bold">Your Profile ✨</h1>
+        <ProfileHero user={profile.user} gamification={profile.gamification} />
 
-        {loading && (
-          <div className="space-y-4">
-            <Skeleton className="h-24 w-full" />
-            <Skeleton className="h-48 w-full" />
-          </div>
-        )}
-
-        {error && <p className="text-red-500">{error}</p>}
-
-        {!loading && profile && (
-          <>
-            <XPWidget gamification={profile.gamification} />
-            <AchievementGrid achievements={profile.gamification.achievements} />
-          </>
-        )}
-
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+          <GoalsStats goals={profile.stats.goals} />
+          <AchievementsStats achievements={profile.stats.achievements} />
+          <ActivityStats activity={profile.stats.activity} />
+        </div>
       </div>
     </MainLayout>
   );

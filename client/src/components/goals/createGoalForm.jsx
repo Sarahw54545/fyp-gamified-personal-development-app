@@ -16,6 +16,7 @@ function CreateGoalForm({ onGoalCreated }) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [dueDate, setDueDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -35,7 +36,7 @@ function CreateGoalForm({ onGoalCreated }) {
         `/api/goals`,
         {
           method: "POST",
-          body: JSON.stringify({ title, description }),
+          body: JSON.stringify({ title: title, description: description || null, due_date: dueDate || null }),
         }
       );
 
@@ -44,6 +45,7 @@ function CreateGoalForm({ onGoalCreated }) {
       // Reset form
       setTitle("");
       setDescription("");
+      setDueDate("");
       setOpen(false);
     } catch (err) {
       setError(err.message || "Failed to create goal");
@@ -68,15 +70,31 @@ function CreateGoalForm({ onGoalCreated }) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
             placeholder="Goal Title"
+            maxLength={96}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
 
           <Textarea
-            placeholder="Description (optional)"
+            placeholder="Description (Optional)"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
+
+          <label className="text-sm font-medium text-muted-foreground">
+            Due Date (Optional)
+          </label>
+
+          <div className="w-[180px]">
+            <Input
+              type="date"
+              placeholder="Due Date (Optional)"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              min={new Date().toISOString().split("T")[0]}
+            />
+          </div>
+
 
           {error && <p className="text-red-500 text-sm">{error}</p>}
 
