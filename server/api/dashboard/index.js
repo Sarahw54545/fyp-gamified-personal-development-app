@@ -42,6 +42,7 @@ router.get("/", async (req, res) => {
         const user = userRes.rows[0];
 
         const level = GamificationEngine.calculateLevel(user.total_xp);
+        const nextLevelXp = GamificationEngine.xpForNextLevel(level);
 
         /** DAILY ACHIEVEMENTS */
         const dailyAchievements = achievements
@@ -73,7 +74,8 @@ router.get("/", async (req, res) => {
             user: {
                 email: user.email,
                 totalXp: user.total_xp,
-                level
+                level,
+                nextLevelXp
             },
             todayGoals: goalsRes.rows,
             dailyAchievements,

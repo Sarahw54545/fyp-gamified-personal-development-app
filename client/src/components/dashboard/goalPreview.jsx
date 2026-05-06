@@ -1,29 +1,30 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import GoalCard from "../goals/goalCard";
 
-export function GoalPreview() {
+export function GoalPreview({ goals, onComplete, onDelete }) {
   return (
-    <Card>
-      <CardContent className="p-6">
+    <Card className="bg-slate-900 border-slate-800">
+      <CardContent className="p-4">
+        <h3 className="mb-3 font-semibold text-center">Today’s Goals</h3>
 
-        <h3 className="mb-4 font-semibold">
-          Today's Goals
-        </h3>
+        {goals.length === 0 && (
+          <p className="text-muted-foreground">
+            No goals scheduled for today
+          </p>
+        )}
 
-        <div className="space-y-3">
-
-          <div className="flex justify-between">
-            *GOAL 1*
-            <Button size="sm">Complete</Button>
-          </div>
-
-          <div className="flex justify-between">
-            *GOAL 2*
-            <Button size="sm">Complete</Button>
-          </div>
-
+        <div className="grid gap-4 md:grid-cols-3">
+          {goals.map(goal => (
+            <GoalCard
+              key={goal.id}
+              goal={goal}
+              variant="dashboard"
+              onComplete={onComplete}
+              onDelete={onDelete}
+              compact
+            />
+          ))}
         </div>
-
       </CardContent>
     </Card>
   );

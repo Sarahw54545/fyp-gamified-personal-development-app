@@ -12,7 +12,7 @@ import DeleteGoalDialog from "./deleteGoalDialog";
 import EditGoalForm from "./editGoalForm"
 import { startOfToday, getRelativeDueText } from "@/lib/dates";
 
-function GoalCard({ goal, onDelete, onGoalUpdated, onComplete }) {
+function GoalCard({ goal, onDelete, onGoalUpdated, onComplete, variant }) {
   const [expanded, setExpanded] = useState(false);
   const isCompleted = goal.completed;
   const isArchived = !goal.is_active;
@@ -29,7 +29,9 @@ function GoalCard({ goal, onDelete, onGoalUpdated, onComplete }) {
 
   return (
 
-    <Card className={`bg-slate-900 border-slate-800 transition-all duration-300 flex flex-col ${isOverdue ? "hover:border-red-500/60 border-red-950 hover:shadow-[0_0_20px_rgba(239,68,68,0.45)] bg-red-950/20" : "border-slate-800"} ${!isCompleted && !isOverdue && "hover:border-indigo-500 hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]"}`}>
+    
+    <Card
+      className={`transition-all duration-300 flex flex-col ${variant === "dashboard" ? "bg-slate-800 border-slate-700" : "bg-slate-900 border-slate-800"}${isOverdue ? "hover:border-red-500/60 border-red-950 hover:shadow-[0_0_20px_rgba(239,68,68,0.45)] bg-red-950/20" : !isCompleted && "hover:border-indigo-500 hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]"}`}>
 
       <CardHeader className={isCompleted ? "opacity-60 overflow-hidden" : "overflow-hidden"}>
 
