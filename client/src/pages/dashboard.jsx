@@ -5,6 +5,7 @@ import { GoalPreview } from "../components/dashboard/goalPreview";
 import { StreakCard } from "../components/dashboard/streakCard";
 import { AchievementPreview } from "../components/dashboard/achievementPreview";
 import { apiFetch } from "@/services/apiClient";
+import { toast } from "sonner";
 
 function Dashboard() {
   const [dashboard, setDashboard] = useState(null);
@@ -31,14 +32,51 @@ function Dashboard() {
   const { user, todayGoals, dailyAchievements, streak } = dashboard;
 
   const handleCompleteGoal = async (id) => {
-    const res = await apiFetch(`/api/goals/${id}/complete`, { method: "POST" });
+    try {
+      const res = await apiFetch(`/api/goals/${id}/complete`, {
+        method: "POST",
+      });
 
-    setDashboard(prev => ({
-      ...prev,
-      todayGoals: prev.todayGoals.map(g =>
-        g.id === id ? res.goal : g
-      ),
-    }));
+      setDashboard(prev => ({
+        ...prev,
+        todayGoals: prev.todayGoals.map(g =>
+          g.id === id ? res.goal : g
+        ),
+      }));
+
+      toast.custom(() => (
+        <div className="p-4">
+          <strong>Goal Completed ✅</strong>
+        </div>
+      ));
+
+      res.gamification.unlockedAchievements.forEach((achievement) => {
+        toast.custom(() => (
+          <div className="p-4">
+            <strong>
+              {achievement.type === "daily"
+                ? "Daily Achievement 🌟"
+                : "Achievement Unlocked 🏆"}
+            </strong>
+            <p>
+              {achievement.label
+                ? `${achievement.label} (+${achievement.xp} XP)`
+                : `+${achievement.xp} XP`}
+            </p>
+          </div>
+        ));
+      });
+
+    } catch (err) {
+      console.error("Failed to complete goal:", err);
+      toast.custom(() => (
+        <div className="p-4">
+          <strong>Error</strong>
+          <p>Failed to complete goal.</p>
+        </div>
+      ));
+    }
+
   };
 
   const handleDeleteGoal = async (id) => {
