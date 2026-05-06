@@ -26,5 +26,17 @@ export default [
       event: "GOAL_COMPLETED"
     },
     xp: 10
+  },
+  {
+    key: "DAILY_LOGIN",
+    type: "daily",
+    category: "consistency",
+    title: "Daily Check‑In",
+    description: "Log in today",
+    criteria: {
+      type: "event",
+      event: "LOGIN_SUCCESS"
+    },
+    xp: 5
   }
 ];

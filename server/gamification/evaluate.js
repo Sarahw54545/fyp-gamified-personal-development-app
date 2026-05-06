@@ -23,7 +23,7 @@ export function evaluateGamification({
         const achievementState = userState.achievements[achievement.key];
 
         // -------------------------
-        // Daily Achievement - Daily Event Check (Will Only Update Once Per Calendar Day)
+        // Daily Achievements - Daily Event Check (Will Only Update Once Per Calendar Day)
         // -------------------------
 
         if (achievement.type === "daily") {
@@ -34,9 +34,11 @@ export function evaluateGamification({
                 return;
             }
 
-
             if (matchesCriteria(achievement.criteria, userState, event)) {
+
+                const previousDate = achievementState.lastCompletedDate;
                 achievementState.lastCompletedDate = new Date(today);
+
                 userState.totalXp += achievement.xp;
                 xpAwarded += achievement.xp;
 
@@ -47,7 +49,6 @@ export function evaluateGamification({
                 });
             }
         }
-
 
         // -------------------------
         // Progressive Achievements
@@ -92,7 +93,6 @@ export function evaluateGamification({
                     nextThreshold: nextTier.threshold
                 });
             }
-
         }
     });
 

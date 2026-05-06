@@ -3,7 +3,7 @@ import { calculateLevel } from "./levels.js";
 import { xpForNextLevel } from "./levels.js";
 
 export default {
-  evaluateGamification,
   calculateLevel,
-  xpForNextLevel
+  xpForNextLevel,
+  evaluateGamification
 };

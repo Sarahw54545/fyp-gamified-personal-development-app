@@ -5,104 +5,95 @@ import achievements from "../../gamification/achievements.js";
 
 const router = express.Router();
 
-// GET user profile data
+// GET user profile page data
 router.get("/", async (req, res) => {
   const userId = req.user.id;
 
   try {
-    // 1. Load user base data
-    const userResult = await pool.query(
-      `SELECT id, email, total_xp FROM users WHERE id = $1`,
-      [userId]
-    );
 
-    if (userResult.rows.length === 0) {
+    const [userRes, goalsRes, countersRes, achievementsRes] = await Promise.all([
+      pool.query(
+        `SELECT id, email, total_xp FROM users WHERE id = $1`,
+        [userId]
+      ),
+      pool.query(
+        `SELECT completed FROM goal WHERE user_id = $1`,
+        [userId]
+      ),
+      pool.query(
+        `SELECT counter_key, value FROM user_counters WHERE user_id = $1`,
+        [userId]
+      ),
+      pool.query(
+        `
+        SELECT completed_tiers, last_completed_date
+        FROM user_achievements
+        WHERE user_id = $1
+        `,
+        [userId]
+      )
+    ]);
+
+    if (userRes.rows.length === 0) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const user = userResult.rows[0];
+    const user = userRes.rows[0];
 
-    // 2. Load counters
-    const countersResult = await pool.query(
-      `SELECT counter_key, value FROM user_counters WHERE user_id = $1`,
-      [userId]
-    );
-
-    const counters = Object.fromEntries(
-      countersResult.rows.map(row => [row.counter_key, row.value])
-    );
-
-    // 3. Load achievement state
-    const achievementsResult = await pool.query(
-      `
-      SELECT achievement_key, completed_tiers, last_completed_date
-      FROM user_achievements
-      WHERE user_id = $1
-      `,
-      [userId]
-    );
-
-    const achievementState = Object.fromEntries(
-      achievementsResult.rows.map(row => [
-        row.achievement_key,
-        {
-          completedTiers: row.completed_tiers || [],
-          lastCompletedDate: row.last_completed_date
-        }
-      ])
-    );
-
-    // 4. Derive level from total XP
+    /* Level Calculation */
     const level = GamificationEngine.calculateLevel(user.total_xp);
     const nextLevelXp = GamificationEngine.xpForNextLevel(level);
 
-    // 5. Merge static achievement definitions with user progress
-    const achievementsWithProgress = achievements.map(def => {
-      const state = achievementState[def.key] || {};
 
-      if (def.type === "progressive") {
-        const completedTiers = state.completedTiers || [];
-        const highestCompleted =
-          completedTiers.length > 0 ? Math.max(...completedTiers) : 0;
 
-        const nextTier = def.tiers.find(
-          tier => !completedTiers.includes(tier.threshold)
-        );
+    /* Goals Stats */
+    const totalCreated = goalsRes.rows.length;
+    const totalCompleted = goalsRes.rows.filter(g => g.completed).length;
+    const completionRate =
+      totalCreated > 0 ? totalCompleted / totalCreated : 0;
 
-        return {
-          key: def.key,
-          title: def.title,
-          description: def.description,
-          category: def.category,
-          type: def.type,
 
-          tiers: def.tiers.map(t => ({
-            threshold: t.threshold,
-            label: t.label
-          })),
 
-          completedTiers,
-          currentValue: counters[def.criteria.event] || 0,
-          nextThreshold: nextTier ? nextTier.threshold : null,
-          isComplete: !nextTier
-        };
-      }
+    /* Calculate Achievement Stats */
+    const achievementStates = achievementsRes.rows;
 
-      if (def.type === "daily") {
-        return {
-          key: def.key,
-          title: def.title,
-          description: def.description,
-          category: def.category,
-          type: def.type,
-          completedToday: !!state.lastCompletedDate
-        };
-      }
+    const progressiveDefs = achievements.filter(
+      a => a.type === "progressive"
+    );
 
-      return def;
-    });
+    const progressiveKeys = new Set(
+      progressiveDefs.map(a => a.key)
+    );
 
-    // 6. Respond with aggregated profile data
+    const completedProgressiveCount =
+      achievementStates.filter(
+        a =>
+          progressiveKeys.has(a.achievement_key) &&
+          (a.completed_tiers || []).length > 0
+      ).length;
+
+    const progressiveCompletionRate =
+      progressiveDefs.length > 0
+        ? completedProgressiveCount / progressiveDefs.length
+        : 0;
+
+    const dailyCompleted =
+      achievementStates.filter(
+        a => a.last_completed_date !== null
+      ).length;
+
+
+
+    /* Activity Stats */
+    const counters = Object.fromEntries(
+      countersRes.rows.map(row => [row.counter_key, row.value])
+    );
+
+    const longestStreak = counters.LONGEST_STREAK || 0;
+    const activeDays = counters.ACTIVE_DAYS || 0;
+
+
+
     res.json({
       user: {
         id: user.id,
@@ -111,8 +102,23 @@ router.get("/", async (req, res) => {
       gamification: {
         totalXp: user.total_xp,
         level,
-        nextLevelXp,
-        achievements: achievementsWithProgress
+        nextLevelXp
+      },
+      stats: {
+        goals: {
+          totalCreated,
+          totalCompleted,
+          completionRate
+        },
+        achievements: {
+          totalCompleted: completedProgressiveCount,
+          dailyCompleted,
+          progressiveCompletionRate
+        },
+        activity: {
+          longestStreak,
+          activeDays
+        }
       }
     });
 
