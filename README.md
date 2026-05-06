@@ -131,8 +131,8 @@ npm run dev
 
 The gamification logic used in Stellara is designed as a **modular backend engine** and has been published as a standalone repository for public use.
 
-➡️ **Gamification Engine Repository:**  
-*(Coming soon — documentation and usage guide will be provided)*
+➡️ **Gamification Engine Repository:**
+[gamification-engine.js](https://github.com/Sarahw54545/gamification-engine-js/edit/main/README.md)
 
 This engine can be reused in other applications that require achievement‑based progression systems.
 
