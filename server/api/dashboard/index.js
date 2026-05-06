@@ -55,6 +55,8 @@ router.get("/", async (req, res) => {
                 return {
                     key: def.key,
                     title: def.title,
+                    description: def.description,
+                    type: def.type,
                     xp: def.xp,
                     completedToday: !!state?.last_completed_date
                 };

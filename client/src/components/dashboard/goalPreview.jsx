@@ -8,8 +8,8 @@ export function GoalPreview({ goals, onComplete, onDelete }) {
         <h3 className="mb-3 font-semibold text-center">Today’s Goals</h3>
 
         {goals.length === 0 && (
-          <p className="text-muted-foreground">
-            No goals scheduled for today
+          <p className="text-muted-foreground text-center">
+            No goals scheduled for today...
           </p>
         )}
 

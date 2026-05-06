@@ -22,7 +22,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Create a Goal
+// Create a Goal + Trigger Gamification
 router.post("/", async (req, res) => {
   try {
     const { title, description, due_date } = req.body;
@@ -45,6 +45,101 @@ router.post("/", async (req, res) => {
         userId
       ]
     );
+
+    const now = new Date();
+    const today = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
+
+    // 2. Load counters
+    const countersRes = await pool.query(
+      `SELECT counter_key, value FROM user_counters WHERE user_id = $1`,
+      [userId]
+    );
+
+    // 3. Load user achievements
+    const achievementsRes = await pool.query(
+      `
+  SELECT achievement_key, completed_tiers, last_completed_date
+  FROM user_achievements
+  WHERE user_id = $1
+  `,
+      [userId]
+    );
+
+    // 4. Load user XP
+    const userRes = await pool.query(
+      `SELECT total_xp FROM users WHERE id = $1`,
+      [userId]
+    );
+
+    // 5. Build userState
+    const userState = {
+      userId,
+      totalXp: userRes.rows[0]?.total_xp ?? 0,
+      counters: Object.fromEntries(
+        countersRes.rows.map(c => [c.counter_key, c.value])
+      ),
+      achievements: Object.fromEntries(
+        achievementsRes.rows.map(a => [
+          a.achievement_key,
+          {
+            completedTiers: a.completed_tiers || [],
+            lastCompletedDate: a.last_completed_date
+          }
+        ])
+      )
+    };
+
+    // 6. Evaluate gamification
+    const gamificationResult = GamificationEngine.evaluateGamification({
+      userState,
+      event: { type: "GOAL_CREATED" },
+      achievements,
+      today
+    });
+
+    // 7. Persist XP
+    await pool.query(
+      `UPDATE users SET total_xp = $1 WHERE id = $2`,
+      [userState.totalXp, userId]
+    );
+
+    // 8. Persist achievement state
+    for (const [key, state] of Object.entries(userState.achievements)) {
+      await pool.query(
+        `
+    INSERT INTO user_achievements
+      (user_id, achievement_key, completed_tiers, last_completed_date)
+    VALUES ($1, $2, $3, $4)
+    ON CONFLICT (user_id, achievement_key)
+    DO UPDATE SET
+      completed_tiers = $3,
+      last_completed_date = $4
+    `,
+        [
+          userId,
+          key,
+          state.completedTiers || [],
+          state.lastCompletedDate || null
+        ]
+      );
+    }
+
+    // 9. Persist counters
+    for (const [key, value] of Object.entries(userState.counters)) {
+      await pool.query(
+        `
+    INSERT INTO user_counters (user_id, counter_key, value)
+    VALUES ($1, $2, $3)
+    ON CONFLICT (user_id, counter_key)
+    DO UPDATE SET value = $3
+    `,
+        [userId, key, value]
+      );
+    }
 
     res.status(201).json(newGoal.rows[0]);
 

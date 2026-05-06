@@ -20,7 +20,7 @@ export default [
     type: "daily",
     category: "consistency",
     title: "Daily Momentum",
-    description: "Complete any goal today",
+    description: "Complete a Goal Today",
     criteria: {
       type: "event",
       event: "GOAL_COMPLETED"
@@ -31,12 +31,24 @@ export default [
     key: "DAILY_LOGIN",
     type: "daily",
     category: "consistency",
-    title: "Daily Check‑In",
-    description: "Log in today",
+    title: "Daily Check-In",
+    description: "Log In Today",
     criteria: {
       type: "event",
       event: "LOGIN_SUCCESS"
     },
     xp: 5
+  },
+  {
+    key: "DAILY_PLANNING",
+    type: "daily",
+    category: "consistency",
+    title: "Daily Planning",
+    description: "Create a Goal today",
+    criteria: {
+      type: "event",
+      event: "GOAL_CREATED"
+    },
+    xp: 10
   }
 ];

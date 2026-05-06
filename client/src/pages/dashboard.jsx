@@ -59,31 +59,26 @@ function Dashboard() {
         nextLevelXp={dashboard.user.nextLevelXp}
       />
 
-      {/* 3-column grid */}
-      <div className="grid grid-cols-3 gap-6 mt-6">
+      <div className="mt-6 space-y-4">
+        <GoalPreview
+          goals={todayGoals.slice(0, 3)}
+          onComplete={handleCompleteGoal}
+          onDelete={handleDeleteGoal}
+        />
+      </div>
 
-        {/* Goals – full width */}
-        <div className="col-span-3">
 
-          <GoalPreview
-            goals={todayGoals.slice(0, 3)}
-            onComplete={handleCompleteGoal}
-            onDelete={handleDeleteGoal}
-          />
+      <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 
-        </div>
-
-        {/* Achievements – 2 columns */}
-        <div className="col-span-2">
+        <div className="lg:col-span-2 space-y-4">
           <AchievementPreview achievements={dailyAchievements.slice(0, 3)} />
         </div>
 
-        {/* Streak – 1 column */}
-        <div className="col-span-1">
+        <div className="lg:col-span-1 space-y-4">
           <StreakCard streak={streak.current} />
         </div>
       </div>
-    </MainLayout>
+    </MainLayout >
   );
 }
 
