@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { AchievementGrid } from "../achievements/AchievementGrid";
+import { AchievementGrid } from "../achievements/achievementGrid";
 
 export function AchievementPreview({ achievements }) {
   return (
