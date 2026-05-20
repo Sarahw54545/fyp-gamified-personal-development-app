@@ -1,7 +1,8 @@
 # Stellara 🌟
 ### A Gamified Personal Development Platform
 
-Stellara is a full‑stack web application designed to help users build and maintain positive habits through **meaningful gamification**.  
+Stellara is a full‑stack web application designed to help users build and maintain positive habits through **meaningful gamification**.
+
 Rather than focusing on competition, Stellara encourages **consistency, reflection, and long‑term engagement** using experience points (XP), levels, achievements, and visual progress feedback.
 
 This project was developed as a **Final Year Project (BSc (Hons) Creative Computing)** and follows professional software engineering practices including Agile development, CI/CD, and modular backend architecture.
@@ -131,7 +132,7 @@ npm run dev
 
 The gamification logic used in Stellara is designed as a **modular backend engine** and has been published as a standalone repository for public use.
 
-➡️ **Gamification Engine Repository:** [gamification-engine.js](https://github.com/Sarahw54545/gamification-engine-js/edit/main/README.md)
+➡️ **Gamification Engine Repository:** [gamification-engine.js](https://github.com/Sarahw54545/gamification-engine-js/)
 
 📘 **Documentation:** [Github Pages Site](https://sarahw54545.github.io/gamification-engine-js/)
 
