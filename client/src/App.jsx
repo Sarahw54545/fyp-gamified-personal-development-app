@@ -4,6 +4,7 @@ import Dashboard from "./pages/dashboard";
 import Goals from "./pages/goals";
 import Achievements from "./pages/achievements";
 import Profile from "./pages/profile";
+import LandingPage from "./pages/landingPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import PublicRoute from "./components/auth/PublicRoute";
 import Login from "./pages/login";
@@ -13,7 +14,7 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<PublicRoute> <Login /> </PublicRoute>} />
+      <Route path="/" element={<PublicRoute> <LandingPage /> </PublicRoute>} />
       <Route path="/dashboard" element={<ProtectedRoute> <Dashboard /> </ProtectedRoute>} />
       <Route path="/goals" element={<ProtectedRoute> <Goals /> </ProtectedRoute>} />
       <Route path="/achievements" element={<ProtectedRoute> <Achievements /> </ProtectedRoute>} />
