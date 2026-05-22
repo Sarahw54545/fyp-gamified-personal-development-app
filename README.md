@@ -39,9 +39,9 @@ This project was developed as a **Final Year Project (BSc (Hons) Creative Comput
 ## 🧠 Gamification Philosophy
 
 Stellara’s gamification system is informed by **Self‑Determination Theory** and focuses on:
-- **Autonomy** — users set their own goals
-- **Competence** — visible progression and mastery
-- **Consistency** — daily reinforcement without pressure
+- **Autonomy** - users set their own goals
+- **Competence** - visible progression and mastery
+- **Consistency** - daily reinforcement without pressure
 
 Competitive elements such as leaderboards were intentionally excluded to avoid discouraging long‑term engagement.
 
