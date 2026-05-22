@@ -194,7 +194,7 @@ function AuthForm({ mode }) {
 
         <button
           type="submit"
-          className="w-full bg-indigo-600 p-2 rounded disabled:opacity-50"
+          className="w-full bg-indigo-600 p-2 rounded disabled:opacity-50 hover:bg-indigo-600 hover:scale-105 hover:shadow-[0_0_20px_rgba(99,102,241,0.5)] transition"
           disabled={loading}
         >
           {loading
